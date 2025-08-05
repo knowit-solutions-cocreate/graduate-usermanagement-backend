@@ -13,15 +13,12 @@ builder.Services.AddControllers();
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseNpgsql(connectionString));
 
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("AllowAllOrigins",
-        builder => builder
-            .AllowAnyOrigin()
-            //.AllowCredentials() 
+builder.Services.AddCors(options => {
+    options.AddPolicy("AllowFrontend", policy => {
+        policy.WithOrigins("http://localhost:8080")
             .AllowAnyHeader()
-            .AllowAnyMethod());
-
+            .AllowAnyMethod();
+    });
 });
 
 
@@ -34,6 +31,8 @@ using (var scope = app.Services.CreateScope()) {
 }
 
 // Configure the HTTP request pipeline.
+app.UseRouting();
+app.UseCors("AllowFrontend");
 app.UseMiddleware<JwtMiddleware>();
 
 app.UseHttpsRedirection();

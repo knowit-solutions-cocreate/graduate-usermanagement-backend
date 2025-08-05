@@ -34,6 +34,11 @@ public class AuthController : ControllerBase {
     [HttpGet("validate")]
     public IActionResult Validate() {
         var userId = HttpContext.Items["UserId"]?.ToString();
-        return userId == null ? Unauthorized() : Ok(new { userId });
+        if (userId == null) return Unauthorized();
+
+        var user = _db.Users.FirstOrDefault(u => u.Id.ToString() == userId);
+        if (user == null) return Unauthorized();
+
+        return Ok(user);
     }
 }

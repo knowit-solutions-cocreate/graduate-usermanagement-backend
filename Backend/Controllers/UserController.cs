@@ -77,10 +77,13 @@ public class UserController : ControllerBase {
     }
 
     // DELETE /api/user/{id}
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> Delete(Guid id) {
-        var user = await _db.Users.FindAsync(id);
-        if (user is null) return NotFound();
+    [HttpDelete]
+    public async Task<IActionResult> DeleteSelf() {
+        var userId = HttpContext.Items["UserId"] as Guid?;
+        if (userId == null) return Unauthorized();
+
+        var user = await _db.Users.FindAsync(userId);
+        if (user == null) return NotFound();
 
         _db.Users.Remove(user);
         await _db.SaveChangesAsync();
